@@ -28,20 +28,4 @@ function App() {
         circlemarker: false,
       },
     });
-    map.addControl(drawControl);
-
-    map.on(L.Draw.Event.CREATED, function (event) {
-      const layer = event.layer;
-      drawnItems.addLayer(layer);
-    });
-  }, []);
-
-  return (
-    <div>
-      <h1 style={{ textAlign: "center" }}>Auto-TGS Generator (Beta)</h1>
-      <div id="map" style={{ height: "90vh", width: "100%" }}></div>
-    </div>
-  );
-}
-
-expo
+    map.addControl
