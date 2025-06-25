@@ -4,6 +4,7 @@ import {
   getBufferZone,
   getConesSpacing
 } from '../rules/vicroadsRules';
+import { generateTrafficSetup } from './utils/generateSetup';
 
 export function generateTrafficSetup(speed) {
   const [signA, signB, signC] = getSignSpacing(speed);
