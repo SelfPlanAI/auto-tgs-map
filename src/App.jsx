@@ -1,7 +1,21 @@
 import { useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
-import "leaflet-control-geocoder/dist/Control.Geocoder.css";
+import "leaflet-control-geocoder/dist/Control.Geocoder.css";import "leaflet-control-geocoder";
+
+useEffect(() => {
+  const map = L.map("map").setView([-37.8136, 144.9631], 13); // Melbourne default
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; OpenStreetMap contributors',
+  }).addTo(map);
+
+  // Add Geocoder control
+  L.Control.geocoder({
+    defaultMarkGeocode: true,
+  }).addTo(map);
+}, []);
+
 import L from "leaflet";
 import "leaflet-draw";
 
