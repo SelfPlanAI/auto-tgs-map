@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import "leaflet-control-geocoder/dist/Control.Geocoder.css";
 
-import L from "leaflet";
+import * as L from "leaflet"; // ✅ FIXED: Correct Leaflet import
 import "leaflet-draw";
 import "leaflet-control-geocoder";
 
@@ -12,78 +12,72 @@ import { generateTrafficSetup } from "./utils/generateSetup";
 
 function App() {
   useEffect(() => {
-    console.log("App mounted. Map div:", document.getElementById("map"));
+    console.log("Mounting map...");
 
-    // Initialize the map
-    const map = L.map("map").setView([-37.8136, 144.9631], 13); // Melbourne
+    try {
+      const map = L.map("map").setView([-37.8136, 144.9631], 13); // Melbourne
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; OpenStreetMap contributors',
-    }).addTo(map);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; OpenStreetMap contributors',
+      }).addTo(map);
 
-    // Add geocoder (search bar)
-    L.Control.geocoder({ defaultMarkGeocode: true }).addTo(map);
+      // Add geocoder (search bar)
+      L.Control.geocoder({ defaultMarkGeocode: true }).addTo(map);
 
-    // Add draw controls
-    const drawnItems = new L.FeatureGroup();
-    map.addLayer(drawnItems);
+      // Add draw controls
+      const drawnItems = new L.FeatureGroup();
+      map.addLayer(drawnItems);
 
-    const drawControl = new L.Control.Draw({
-      edit: { featureGroup: drawnItems },
-      draw: {
-        polygon: true,
-        rectangle: true,
-        circle: false,
-        marker: false,
-        polyline: false,
-      },
-    });
-    map.addControl(drawControl);
+      const drawControl = new L.Control.Draw({
+        edit: { featureGroup: drawnItems },
+        draw: {
+          polygon: true,
+          rectangle: true,
+          circle: false,
+          marker: false,
+          polyline: false,
+        },
+      });
+      map.addControl(drawControl);
 
-    // On drawing completion
-    map.on(L.Draw.Event.CREATED, function (event) {
-      const layer = event.layer;
-      drawnItems.addLayer(layer);
+      // On drawing completion
+      map.on(L.Draw.Event.CREATED, function (event) {
+        const layer = event.layer;
+        drawnItems.addLayer(layer);
 
-      const bounds = layer.getBounds?.() || layer.getLatLngs?.();
+        const bounds = layer.getBounds?.() || layer.getLatLngs?.();
+        const setup = generateTrafficSetup(bounds);
 
-      let setup;
-      try {
-        setup = generateTrafficSetup(bounds);
-      } catch (e) {
-        console.error("generateTrafficSetup error:", e);
-        return;
-      }
+        // === Draw TGS elements ===
 
-      // === Draw TGS elements ===
+        // 1. Buffer Line
+        if (setup.bufferStart && setup.bufferEnd) {
+          L.polyline(
+            [setup.bufferStart, setup.bufferEnd],
+            { color: "red", dashArray: "5, 10" }
+          ).addTo(map);
+        }
 
-      // 1. Buffer Line
-      if (setup.bufferStart && setup.bufferEnd) {
-        L.polyline(
-          [setup.bufferStart, setup.bufferEnd],
-          { color: "red", dashArray: "5, 10" }
-        ).addTo(map);
-      }
+        // 2. Taper Line
+        if (setup.taperStart && setup.taperEnd) {
+          L.polyline(
+            [setup.taperStart, setup.taperEnd],
+            { color: "orange", dashArray: "5, 10" }
+          ).addTo(map);
+        }
 
-      // 2. Taper Line
-      if (setup.taperStart && setup.taperEnd) {
-        L.polyline(
-          [setup.taperStart, setup.taperEnd],
-          { color: "orange", dashArray: "5, 10" }
-        ).addTo(map);
-      }
-
-      // 3. Signs
-      if (Array.isArray(setup.signs)) {
-        setup.signs.forEach((sign) => {
+        // 3. Signs
+        setup.signs.forEach(sign => {
           L.marker(sign.position, {
             title: sign.type,
           })
             .bindPopup(sign.type)
             .addTo(map);
         });
-      }
-    });
+      });
+    } catch (err) {
+      console.error("Failed to mount map:", err);
+    }
   }, []);
 
   return <div id="map" style={{ height: "100vh", width: "100%" }}></div>;
