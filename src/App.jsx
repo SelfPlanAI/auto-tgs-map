@@ -11,14 +11,17 @@ import { generateTrafficSetup } from "./utils/generateSetup";
 
 function App() {
   useEffect(() => {
-    const map = L.map("map").setView([-37.8136, 144.9631], 13);
+    // Initialize the map
+    const map = L.map("map").setView([-37.8136, 144.9631], 13); // Melbourne
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: '&copy; OpenStreetMap contributors',
     }).addTo(map);
 
+    // Add geocoder (search bar)
     L.Control.geocoder({ defaultMarkGeocode: true }).addTo(map);
 
+    // Add draw controls
     const drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
 
@@ -34,6 +37,7 @@ function App() {
     });
     map.addControl(drawControl);
 
+    // On drawing completion
     map.on(L.Draw.Event.CREATED, function (event) {
       const layer = event.layer;
       drawnItems.addLayer(layer);
@@ -43,28 +47,29 @@ function App() {
 
       // === Draw TGS elements ===
 
-      // 1. Buffer Zone
-      L.polyline(
-        [setup.buffer_zone.start, setup.buffer_zone.end],
-        { color: "orange", dashArray: "4 6" }
-      ).addTo(map);
+      // 1. Buffer Line
+      if (setup.bufferStart && setup.bufferEnd) {
+        L.polyline(
+          [setup.bufferStart, setup.bufferEnd],
+          { color: "red", dashArray: "5, 10" }
+        ).addTo(map);
+      }
 
-      // 2. Taper
-      L.polyline(setup.taper, { color: "blue", weight: 2 }).addTo(map);
+      // 2. Taper Line
+      if (setup.taperStart && setup.taperEnd) {
+        L.polyline(
+          [setup.taperStart, setup.taperEnd],
+          { color: "orange", dashArray: "5, 10" }
+        ).addTo(map);
+      }
 
-      // 3. Work Area
-      L.polygon(setup.work_area, {
-        color: "red",
-        fillColor: "#f03",
-        fillOpacity: 0.3,
-      }).addTo(map);
-
-      // 4. Signs
-      setup.signs.forEach((sign) => {
-        L.marker(sign.position)
-          .addTo(map)
+      // 3. Signs
+      setup.signs.forEach(sign => {
+        L.marker(sign.position, {
+          title: sign.type,
+        })
           .bindPopup(sign.type)
-          .openPopup();
+          .addTo(map);
       });
     });
   }, []);
