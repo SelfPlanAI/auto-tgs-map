@@ -41,6 +41,31 @@ const setup = generateTrafficSetup(60);
 console.log("Auto-generated traffic setup:", setup);
 
 alert(`
+// Example: drop markers at spacing points from start of shape
+const latlngs = layer.getLatLngs()[0]; // assuming polygon or polyline
+if (!latlngs || latlngs.length < 2) return;
+
+const start = latlngs[0];
+const direction = latlngs[1]; // crude approximation
+const latStep = (direction.lat - start.lat);
+const lngStep = (direction.lng - start.lng);
+
+function addMarkerAtDistance(label, distance, color) {
+  const ratio = distance / 100; // crude: 100m = 1x vector diff
+  const lat = start.lat + latStep * ratio;
+  const lng = start.lng + lngStep * ratio;
+  const marker = L.circleMarker([lat, lng], {
+    radius: 5,
+    color: color || 'blue'
+  }).bindTooltip(label).addTo(map);
+}
+
+addMarkerAtDistance("Sign A", setup.signs.signA, 'red');
+addMarkerAtDistance("Sign B", setup.signs.signB, 'orange');
+addMarkerAtDistance("Sign C", setup.signs.signC, 'yellow');
+addMarkerAtDistance("Buffer Start", setup.buffer, 'green');
+addMarkerAtDistance("Taper End", setup.taper + setup.buffer, 'purple');
+
   🚧 Auto Traffic Setup for 60 km/h:
 
   Sign A: ${setup.signs.signA}m
