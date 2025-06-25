@@ -4,7 +4,7 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
 import "leaflet-draw";
 
-import { generateTrafficSetup } from "./utils/generateSetup";
+import { generateTrafficSetup } from "./utils/generateSetup.js";
 
 function App() {
   useEffect(() => {
