@@ -7,6 +7,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@turf/turf": "^7.2.0",
     "leaflet": "^1.9.4",
     "leaflet-control-geocoder": "^3.2.0",
     "leaflet-draw": "^1.0.4",
