@@ -1,3 +1,4 @@
+import "./fixLeafletIcons";
 import { useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
