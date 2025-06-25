@@ -35,6 +35,22 @@ function App() {
     map.on(L.Draw.Event.CREATED, function (event) {
       const layer = event.layer;
       drawnItems.addLayer(layer);
+      // Assume default speed limit for now (60 km/h)
+const setup = generateTrafficSetup(60);
+
+console.log("Auto-generated traffic setup:", setup);
+
+alert(`
+  🚧 Auto Traffic Setup for 60 km/h:
+
+  Sign A: ${setup.signs.signA}m
+  Sign B: ${setup.signs.signB}m
+  Sign C: ${setup.signs.signC}m
+  Taper: ${setup.taper}m
+  Buffer Zone: ${setup.buffer}m
+  Cone Spacing: ${setup.coneSpacing}m
+`);
+
     });
   }, []);
 
