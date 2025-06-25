@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
+import "leaflet-control-geocoder/dist/Control.Geocoder.css";
 import L from "leaflet";
 import "leaflet-draw";
 
