@@ -42,5 +42,34 @@ function App() {
       const setup = generateTrafficSetup(bounds);
 
       // === Draw TGS elements ===
-      // 1. Buffer Zone Line
+
+      // 1. Buffer Zone
       L.polyline(
+        [setup.buffer_zone.start, setup.buffer_zone.end],
+        { color: "orange", dashArray: "4 6" }
+      ).addTo(map);
+
+      // 2. Taper
+      L.polyline(setup.taper, { color: "blue", weight: 2 }).addTo(map);
+
+      // 3. Work Area
+      L.polygon(setup.work_area, {
+        color: "red",
+        fillColor: "#f03",
+        fillOpacity: 0.3,
+      }).addTo(map);
+
+      // 4. Signs
+      setup.signs.forEach((sign) => {
+        L.marker(sign.position)
+          .addTo(map)
+          .bindPopup(sign.type)
+          .openPopup();
+      });
+    });
+  }, []);
+
+  return <div id="map" style={{ height: "100vh", width: "100%" }}></div>;
+}
+
+export default App;
