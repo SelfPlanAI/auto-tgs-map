@@ -12,6 +12,8 @@ import { generateTrafficSetup } from "./utils/generateSetup";
 
 function App() {
   useEffect(() => {
+    console.log("App mounted. Map div:", document.getElementById("map"));
+
     // Initialize the map
     const map = L.map("map").setView([-37.8136, 144.9631], 13); // Melbourne
 
@@ -44,7 +46,14 @@ function App() {
       drawnItems.addLayer(layer);
 
       const bounds = layer.getBounds?.() || layer.getLatLngs?.();
-      const setup = generateTrafficSetup(bounds);
+
+      let setup;
+      try {
+        setup = generateTrafficSetup(bounds);
+      } catch (e) {
+        console.error("generateTrafficSetup error:", e);
+        return;
+      }
 
       // === Draw TGS elements ===
 
@@ -65,13 +74,15 @@ function App() {
       }
 
       // 3. Signs
-      setup.signs.forEach(sign => {
-        L.marker(sign.position, {
-          title: sign.type,
-        })
-          .bindPopup(sign.type)
-          .addTo(map);
-      });
+      if (Array.isArray(setup.signs)) {
+        setup.signs.forEach((sign) => {
+          L.marker(sign.position, {
+            title: sign.type,
+          })
+            .bindPopup(sign.type)
+            .addTo(map);
+        });
+      }
     });
   }, []);
 
